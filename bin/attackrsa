@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-import Wiener
-import Fermat
-import Hastad
-import ChosenCipher
 import argparse
 import sys
+from attackrsa import *
 
 def autoInt(n):
     res = n.split(",")
@@ -34,11 +31,11 @@ if __name__ == "__main__":
         exit(1)
     if args.technique == "wiener":
         if not args.n:
-            print "Please provide the modulus.\n"
+            print "Please provide the modulus.(-n N)\n"
             parser.print_help()
             exit(1)
         if not args.e:
-            print "Please provide the public exponent.\n"
+            print "Please provide the public exponent.(-e E)\n"
             parser.print_help()
             exit(1)
         t = Wiener.Wiener(args.n, args.e)
@@ -56,7 +53,7 @@ if __name__ == "__main__":
             #print "Guessed message: %s" % hex(pt)[2:].rstrip('L').decode("hex")
     elif args.technique == "fermat":
         if not args.n:
-            print "Please provide the modulus.\n"
+            print "Please provide the modulus.(-n N)\n"
             parser.print_help()
             exit(1)
         t = Fermat.Fermat(args.n)
@@ -76,13 +73,16 @@ if __name__ == "__main__":
             #print "Guessed message: %s" % hex(pt)[2:].rstrip('L').decode("hex")
     elif args.technique == "hastad":
         if (not type(args.n) is list) or len(args.n)<3:
-            print "At least 3 modulus are needed."
+            print "At least 3 modulus are needed.(-n <N1,N2,N3,...>"
+            parser.print_help()
             exit(1)
         if (not type(args.c) is list) or len(args.c)<3:
-            print "At least 3 cipher texts are needed."
+            print "At least 3 cipher texts are needed.(-c <C1,C2,C3,...>"
+            parser.print_help()
             exit(1)
         if not args.e:
-            print "A common public key is needed."
+            print "A common public key is needed.(-e E)"
+            parser.print_help()
             exit(1)
         t = Hastad.Hastad(args.n, args.e, args.c)
         pt = t.decrypt()
@@ -90,11 +90,13 @@ if __name__ == "__main__":
         #print "Guessed message: %s" % hex(pt)[2:].rstrip('L').decode("hex")
     elif args.technique == "chosen-cipher":
         if not args.n or not args.e or not args.c:
-            print "Missing arguments. Please provide the modulus, public exponent and the cipher text."
+            print "Missing arguments. Please provide the modulus(-n N), public exponent(-e E) and the cipher text(-c C)."
+            parser.print_help()
             exit(1)
         t = ChosenCipher.ChosenCipher(args.n, args.e, args.c)
         if not args.f or not args.P:
-            print "Missing arguments. Please provide a multiplication factor used to generate a new cipher text, and the corresponding plain text."
+            print "Missing arguments. Please provide a multiplication factor(-f F) used to generate a new cipher text, and the corresponding plain text.(-P P)"
+            parser.print_help()
             exit(1)
         pt = t.decrypt(args.f, args.P)
         print "Plain text is %s" % hex(pt)
