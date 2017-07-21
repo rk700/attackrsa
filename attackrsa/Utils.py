@@ -1,26 +1,25 @@
 #!/usr/bin/env python
-
+import gmpy
 
 def eGCD(a, b):
     '''
     Extended Euclidean gcd. Return g,x,y such that ax+by=g=gcd(a,b)
     '''
-    if a == 0: 
-        return (b, 0, 1)
-    else:
-        g, y, x = eGCD(b%a, a)
-        return (g, x-(b//a)*y, y)
+    u, u1 = 1, 0
+    v, v1 = 0, 1
+    g, g1 = a, b
+    while g1:
+            q = g // g1
+            u, u1 = u1, u - q * u1
+            v, v1 = v1, v - q * v1
+            g, g1 = g1, g - q * g1
+    return u, v
 
 def modInv(a, m):
     '''
     Return r such that a*r mod m = 1
     '''
-    g, x, y = eGCD(a, m)
-    if g != 1:
-        print("no inverse")
-        return None
-    else:
-        return x % m
+    return gmpy.invert(a, m)
 
 def CRT(ds, rs):
     '''
