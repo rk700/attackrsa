@@ -2,7 +2,7 @@
 
 import argparse
 import sys
-from attackrsa import *
+from attackrsa import Wiener,Fermat,Hastad,ChosenCipher,CommonModulus
 
 def autoInt(n):
     res = n.split(",")
@@ -14,7 +14,7 @@ def autoInt(n):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("-t", dest="technique", help="Available techniques: wiener, fermat, hastad, chosen-cipher") 
+    parser.add_argument("-t", dest="technique", help="Available techniques: wiener, fermat, hastad, chosen-cipher, common-modulus") 
     parser.add_argument("-p", dest="p", help="Prime number", type=autoInt) 
     parser.add_argument("-q", dest="q", help="Prime number", type=autoInt) 
     parser.add_argument("-n", dest="n", help="Modulus", type=autoInt) 
@@ -99,6 +99,22 @@ if __name__ == "__main__":
             parser.print_help()
             exit(1)
         pt = t.decrypt(args.f, args.P)
+        print "Plain text is %s" % hex(pt)
+    elif args.technique == "common-modulus":
+        if (not type(args.e) is list) or len(args.e)<2:
+            print "2 exponents are needed.(-e <E1,E2>"
+            parser.print_help()
+            exit(1)
+        if (not type(args.c) is list) or len(args.c)<2:
+            print "2 cipher texts are needed.(-c <C1,C2>"
+            parser.print_help()
+            exit(1)
+        if not args.n:
+            print "Common modulus is needed.(-n N)"
+            parser.print_help()
+            exit(1)
+        t = CommonModulus.CommonModulus(args.n, args.e, args.c)
+        pt = t.decrypt()
         print "Plain text is %s" % hex(pt)
     else:
         print "Invalid technique %s" % args.technique
